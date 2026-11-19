@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-4.25rem)] w-full max-w-6xl items-center px-5 py-16 sm:px-8 sm:py-24">
+    <main className="mx-auto flex min-h-[calc(100vh-4.5rem)] w-full max-w-6xl items-center px-5 py-16 sm:px-8 sm:py-24">
       <div className="max-w-2xl rounded-3xl border border-border bg-card p-7 text-card-foreground shadow-sm sm:p-12">
         <p className="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-primary">
           Welcome to FixMate
