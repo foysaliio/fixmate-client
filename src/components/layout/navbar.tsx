@@ -112,7 +112,7 @@ export function Navbar() {
             <ThemeToggle />
           </div>
 
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex items-center gap-1.5 lg:hidden">
             <ThemeToggle />
             <Button
               type="button"
