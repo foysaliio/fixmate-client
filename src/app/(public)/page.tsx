@@ -1,14 +1,40 @@
 "use client";
 
-import { ArrowRight, CreditCard, Search, Send, Wrench, type LucideIcon } from "lucide-react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import {
+  AirVent,
+  ArrowRight,
+  ArrowUpRight,
+  CreditCard,
+  Laptop,
+  PlugZap,
+  Refrigerator,
+  Search,
+  Send,
+  Smartphone,
+  Tv,
+  WashingMachine,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type PointerEvent } from "react";
 import repairWorkshop from "../../../public/images/fixmate-repair-workshop.webp";
 import { Button } from "@/components/ui/button";
+import { useCardBorderHighlight } from "@/components/ui/card-border-highlight";
+import { SectionHeading } from "@/components/ui/section-heading";
 
 const MotionLink = motion.create(Link);
+
+const repairCategories = [
+  { name: "Smartphone", icon: Smartphone },
+  { name: "Laptop & PC", icon: Laptop },
+  { name: "AC", icon: AirVent },
+  { name: "Refrigerator", icon: Refrigerator },
+  { name: "TV", icon: Tv },
+  { name: "Washing Machine", icon: WashingMachine },
+  { name: "Electrical", icon: PlugZap },
+];
 
 const steps = [
   {
@@ -33,8 +59,6 @@ const steps = [
   },
 ];
 
-const borderSides = ["top", "right", "bottom", "left"] as const;
-
 function StepCard({
   title,
   description,
@@ -48,68 +72,14 @@ function StepCard({
   index: number;
   reducedMotion: boolean | null;
 }) {
-  const [activeSide, setActiveSide] = useState<(typeof borderSides)[number] | null>(null);
-  const lineX = useMotionValue(0);
-  const lineY = useMotionValue(0);
-  const smoothX = useSpring(lineX, { stiffness: 320, damping: 32 });
-  const smoothY = useSpring(lineY, { stiffness: 320, damping: 32 });
-
-  function moveHighlight(event: PointerEvent<HTMLLIElement>) {
-    if (event.pointerType === "touch") return;
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(0, Math.min(event.clientX - bounds.left, bounds.width));
-    const y = Math.max(0, Math.min(event.clientY - bounds.top, bounds.height));
-    const nearest = Math.min(x, bounds.width - x, y, bounds.height - y);
-
-    lineX.set(Math.max(0, Math.min(x - 48, bounds.width - 96)));
-    lineY.set(Math.max(0, Math.min(y - 48, bounds.height - 96)));
-
-    if (nearest === x) {
-      setActiveSide("left");
-    } else if (nearest === bounds.width - x) {
-      setActiveSide("right");
-    } else if (nearest === y) {
-      setActiveSide("top");
-    } else {
-      setActiveSide("bottom");
-    }
-  }
+  const { borderHighlight, ...pointerHandlers } = useCardBorderHighlight(reducedMotion);
 
   return (
     <li
       className="relative rounded-xl border border-border bg-card p-6 text-card-foreground"
-      onPointerEnter={moveHighlight}
-      onPointerMove={moveHighlight}
-      onPointerLeave={() => setActiveSide(null)}
+      {...pointerHandlers}
     >
-      {borderSides.map((side) => {
-        const horizontal = side === "top" || side === "bottom";
-        return (
-          <motion.span
-            key={side}
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              pointerEvents: "none",
-              width: horizontal ? 96 : 2,
-              height: horizontal ? 2 : 96,
-              top: side === "top" ? -1 : horizontal ? undefined : 0,
-              bottom: side === "bottom" ? -1 : undefined,
-              left: side === "right" ? undefined : 0,
-              right: side === "right" ? -1 : undefined,
-              background: horizontal
-                ? "linear-gradient(to right, transparent, var(--primary), transparent)"
-                : "linear-gradient(to bottom, transparent, var(--primary), transparent)",
-              x: horizontal ? (reducedMotion ? lineX : smoothX) : undefined,
-              y: horizontal ? undefined : reducedMotion ? lineY : smoothY,
-            }}
-            initial={false}
-            animate={{ opacity: activeSide === side ? 1 : 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.2 }}
-          />
-        );
-      })}
+      {borderHighlight}
       <div className="mb-7 flex items-start justify-between">
         <motion.span
           className="flex size-12 items-center justify-center rounded-lg bg-secondary text-secondary-foreground"
@@ -131,6 +101,41 @@ function StepCard({
   );
 }
 
+function CategoryCard({
+  name,
+  Icon,
+  reducedMotion,
+}: {
+  name: string;
+  Icon: LucideIcon;
+  reducedMotion: boolean | null;
+}) {
+  const { borderHighlight, ...pointerHandlers } = useCardBorderHighlight(reducedMotion);
+
+  return (
+    <li className="min-w-0">
+      <Link
+        href={`/services?category=${encodeURIComponent(name)}`}
+        className="relative flex h-full min-h-40 flex-col justify-between rounded-xl border border-border bg-card p-4 text-card-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:min-h-44 sm:p-5"
+        {...pointerHandlers}
+      >
+        {borderHighlight}
+        <span className="flex items-start justify-between gap-2">
+          <Icon aria-hidden="true" className="size-8 text-primary sm:size-9" strokeWidth={1.6} />
+          <ArrowUpRight
+            aria-hidden="true"
+            className="size-5 shrink-0 text-muted-foreground"
+            strokeWidth={1.75}
+          />
+        </span>
+        <span className="font-heading text-base font-semibold leading-tight sm:text-lg">
+          {name}
+        </span>
+      </Link>
+    </li>
+  );
+}
+
 export default function Home() {
   const reducedMotion = useReducedMotion();
 
@@ -139,14 +144,11 @@ export default function Home() {
       <section className="overflow-hidden bg-background text-foreground">
         <div className="mx-auto grid min-h-[calc(100svh-4.5rem)] w-full max-w-6xl grid-cols-1 items-center gap-7 px-5 py-7 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:gap-12 lg:py-14">
           <div className="max-w-xl text-left">
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-primary sm:text-sm">
-              For devices &amp; appliances
-            </p>
-            <h1 className="font-heading text-[clamp(2.25rem,11.1vw,2.85rem)] font-bold leading-[1.03] tracking-tight sm:text-6xl lg:text-[4.25rem]">
+            <SectionHeading label="For devices & appliances" level="h1">
               Get it fixed.
               <br />
               <span className="text-primary">Stay in the loop.</span>
-            </h1>
+            </SectionHeading>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
               Book a verified technician, track your repair, and pay after the job is done.
             </p>
@@ -177,15 +179,34 @@ export default function Home() {
         </div>
       </section>
 
+      <section
+        aria-labelledby="popular-repair-categories-heading"
+        className="bg-background py-16 text-foreground sm:py-20 lg:py-24"
+      >
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+          <div className="mb-9 sm:mb-11">
+            <SectionHeading
+              id="popular-repair-categories-heading"
+              label="CHOOSE WHAT NEEDS FIXING"
+            >
+              Popular Repair Categories
+            </SectionHeading>
+          </div>
+
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+            {repairCategories.map(({ name, icon: Icon }) => (
+              <CategoryCard key={name} name={name} Icon={Icon} reducedMotion={reducedMotion} />
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section aria-labelledby="how-it-works-heading" className="bg-background py-16 text-foreground sm:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           <div className="mb-9 max-w-xl sm:mb-11">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary sm:text-sm">
-              Simple from start to finish
-            </p>
-            <h2 id="how-it-works-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <SectionHeading id="how-it-works-heading" label="Simple from start to finish">
               How FixMate Works
-            </h2>
+            </SectionHeading>
           </div>
 
           <ol className="grid gap-4 lg:grid-cols-4 lg:gap-5">
