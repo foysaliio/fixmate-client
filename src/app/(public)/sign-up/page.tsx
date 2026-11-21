@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { authClient } from "@/lib/auth-client";
@@ -109,10 +111,9 @@ export default function SignUpPage() {
               <label htmlFor="sign-up-password" className="mb-2 block text-sm font-medium">
                 Password
               </label>
-              <input
+              <PasswordInput
                 id="sign-up-password"
                 name="password"
-                type="password"
                 autoComplete="new-password"
                 required
                 minLength={6}
@@ -162,6 +163,13 @@ export default function SignUpPage() {
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link href="/sign-in" className="font-medium text-primary underline-offset-4 hover:underline">
+                Sign in
+              </Link>
+            </p>
           </form>
         </div>
       </div>
