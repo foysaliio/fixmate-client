@@ -4,6 +4,7 @@ import {
 	ChevronDown,
 	House,
 	LayoutDashboard,
+	ListChecks,
 	LogOut,
 	Menu,
 	SquarePlus,
@@ -141,19 +142,34 @@ export function DashboardLayout({
 					Overview
 				</Link>
 				{user.role === "technician" && (
-					<Link
-						href="/dashboard/technician/add-service"
-						onClick={() => setMenuOpen(false)}
-						aria-current={
-							pathname === "/dashboard/technician/add-service"
-								? "page"
-								: undefined
-						}
-						className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/technician/add-service" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-					>
-						<SquarePlus aria-hidden="true" className="size-5" />
-						Add a Service
-					</Link>
+					<>
+						<Link
+							href="/dashboard/technician/add-service"
+							onClick={() => setMenuOpen(false)}
+							aria-current={
+								pathname === "/dashboard/technician/add-service"
+									? "page"
+									: undefined
+							}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/technician/add-service" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<SquarePlus aria-hidden="true" className="size-5" />
+							Add a Service
+						</Link>
+						<Link
+							href="/dashboard/technician/my-services"
+							onClick={() => setMenuOpen(false)}
+							aria-current={
+								pathname === "/dashboard/technician/my-services"
+									? "page"
+									: undefined
+							}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/technician/my-services" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ListChecks aria-hidden="true" className="size-5" />
+							My Services
+						</Link>
+					</>
 				)}
 				<Link
 					href="/dashboard/profile"
