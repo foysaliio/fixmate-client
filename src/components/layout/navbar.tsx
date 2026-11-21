@@ -14,7 +14,7 @@ const MotionLink = motion.create(Link);
 const mainLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
-  { href: "/how-it-works", label: "How It Works" },
+  { href: "/about", label: "How It Works" },
 ];
 
 function isActive(pathname: string, href: string) {
