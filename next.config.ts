@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         destination: `${apiBaseUrl.replace(/\/$/, "")}/api/access-token`,
       },
       {
+        source: "/api/services",
+        destination: `${apiBaseUrl.replace(/\/$/, "")}/api/services`,
+      },
+      {
         source: "/api/uploads/image",
         destination: `${apiBaseUrl.replace(/\/$/, "")}/api/uploads/image`,
       },

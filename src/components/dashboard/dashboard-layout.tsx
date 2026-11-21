@@ -6,6 +6,7 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Menu,
+	SquarePlus,
 	UserRound,
 	Wrench,
 	X,
@@ -139,6 +140,21 @@ export function DashboardLayout({
 					<LayoutDashboard aria-hidden="true" className="size-5" />
 					Overview
 				</Link>
+				{user.role === "technician" && (
+					<Link
+						href="/dashboard/technician/add-service"
+						onClick={() => setMenuOpen(false)}
+						aria-current={
+							pathname === "/dashboard/technician/add-service"
+								? "page"
+								: undefined
+						}
+						className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/technician/add-service" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+					>
+						<SquarePlus aria-hidden="true" className="size-5" />
+						Add a Service
+					</Link>
+				)}
 				<Link
 					href="/dashboard/profile"
 					onClick={() => setMenuOpen(false)}
