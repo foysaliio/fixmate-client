@@ -1,15 +1,18 @@
 import { headers } from "next/headers";
+import { cache } from "react";
 
 type AuthSession = {
   user: {
     id: string;
     name: string;
+    email: string;
     role?: string;
+    image?: string | null;
   };
   session: { id: string };
 };
 
-export async function getAuthSession(): Promise<AuthSession | null> {
+export const getAuthSession = cache(async (): Promise<AuthSession | null> => {
   const cookie = (await headers()).get("cookie");
   if (!cookie) return null;
 
@@ -25,4 +28,4 @@ export async function getAuthSession(): Promise<AuthSession | null> {
   const data: unknown = await response.json();
   if (!data || typeof data !== "object" || !("user" in data) || !data.user) return null;
   return data as AuthSession;
-}
+});
