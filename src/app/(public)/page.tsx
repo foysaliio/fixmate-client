@@ -10,7 +10,9 @@ import {
   Refrigerator,
   Search,
   Send,
+  ShieldCheck,
   Smartphone,
+  Tag,
   Tv,
   WashingMachine,
   Wrench,
@@ -55,6 +57,24 @@ const steps = [
   {
     title: "Pay After Completion",
     description: "Pay when the work is done.",
+    icon: CreditCard,
+  },
+];
+
+const benefits = [
+  {
+    title: "Reviewed Service Listings",
+    description: "An admin reviews each listing before it goes live.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Clear Starting Prices",
+    description: "See the starting price before you send a request.",
+    icon: Tag,
+  },
+  {
+    title: "Pay After Completion",
+    description: "Check the final amount and pay once the work is done.",
     icon: CreditCard,
   },
 ];
@@ -136,6 +156,34 @@ function CategoryCard({
   );
 }
 
+function BenefitCard({
+  title,
+  description,
+  Icon,
+  reducedMotion,
+}: {
+  title: string;
+  description: string;
+  Icon: LucideIcon;
+  reducedMotion: boolean | null;
+}) {
+  const { borderHighlight, ...pointerHandlers } = useCardBorderHighlight(reducedMotion);
+
+  return (
+    <li
+      className="relative rounded-xl border border-border bg-card p-6 text-card-foreground"
+      {...pointerHandlers}
+    >
+      {borderHighlight}
+      <span className="mb-7 flex size-12 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+        <Icon aria-hidden="true" className="size-6" strokeWidth={1.75} />
+      </span>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+    </li>
+  );
+}
+
 export default function Home() {
   const reducedMotion = useReducedMotion();
 
@@ -201,7 +249,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section aria-labelledby="how-it-works-heading" className="bg-background py-16 text-foreground sm:py-20 lg:py-24">
+      <section aria-labelledby="how-it-works-heading" className="bg-background pt-16 pb-0 text-foreground sm:pt-20 lg:pt-24">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           <div className="mb-9 max-w-xl sm:mb-11">
             <SectionHeading id="how-it-works-heading" label="Simple from start to finish">
@@ -221,6 +269,31 @@ export default function Home() {
               />
             ))}
           </ol>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="why-choose-fixmate-heading"
+        className="bg-background pt-12 pb-16 text-foreground sm:pt-16 sm:pb-20 lg:pt-[4.5rem] lg:pb-24"
+      >
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+          <div className="mb-9 max-w-xl sm:mb-11">
+            <SectionHeading id="why-choose-fixmate-heading" label="BOOK WITH CONFIDENCE">
+              Why Choose FixMate
+            </SectionHeading>
+          </div>
+
+          <ul className="grid gap-4 lg:grid-cols-3 lg:gap-5">
+            {benefits.map(({ title, description, icon: Icon }) => (
+              <BenefitCard
+                key={title}
+                title={title}
+                description={description}
+                Icon={Icon}
+                reducedMotion={reducedMotion}
+              />
+            ))}
+          </ul>
         </div>
       </section>
     </main>
