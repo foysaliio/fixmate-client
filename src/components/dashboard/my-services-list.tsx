@@ -1,6 +1,12 @@
+"use client";
+
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Wrench } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -10,6 +16,10 @@ export type TechnicianService = {
 	category: string;
 	basePrice: number;
 	image?: string;
+	description?: string;
+	estimatedDuration?: string;
+	serviceMode?: string;
+	serviceArea?: string;
 	approvalStatus?: string;
 	isAvailable?: boolean;
 };
@@ -69,11 +79,189 @@ function ServicePhoto({ service }: { service: TechnicianService }) {
 	);
 }
 
+async function apiError(response: Response, fallback: string) {
+	const data: unknown = await response.json().catch(() => null);
+	return data &&
+		typeof data === "object" &&
+		"message" in data &&
+		typeof data.message === "string"
+		? data.message
+		: fallback;
+}
+
+function ServiceActions({
+	service,
+	onUpdate,
+	onDelete,
+}: {
+	service: TechnicianService;
+	onUpdate: (service: TechnicianService) => void;
+	onDelete: (id: string) => void;
+}) {
+	const router = useRouter();
+	const [busy, setBusy] = useState(false);
+	const [deleteOpen, setDeleteOpen] = useState(false);
+
+	async function authorization() {
+		const response = await fetch("/api/access-token", { method: "POST" });
+		if (!response.ok)
+			throw new Error(await apiError(response, "Please sign in again."));
+		const data: { accessToken?: string } = await response.json();
+		if (!data.accessToken) throw new Error("Could not verify your session.");
+		return `Bearer ${data.accessToken}`;
+	}
+
+	async function changeAvailability() {
+		setBusy(true);
+		try {
+			const response = await fetch(
+				`/api/services/${service._id}/availability`,
+				{
+					method: "PATCH",
+					headers: {
+						authorization: await authorization(),
+						"content-type": "application/json",
+					},
+					body: JSON.stringify({ isAvailable: !service.isAvailable }),
+				},
+			);
+			if (!response.ok)
+				throw new Error(
+					await apiError(response, "Could not update availability."),
+				);
+			onUpdate(await response.json());
+			toast.success("Availability updated.");
+			router.refresh();
+		} catch (error) {
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Could not update availability.",
+			);
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function deleteService() {
+		setBusy(true);
+		try {
+			const response = await fetch(`/api/services/${service._id}`, {
+				method: "DELETE",
+				headers: { authorization: await authorization() },
+			});
+			if (!response.ok)
+				throw new Error(
+					await apiError(response, "Could not delete the service."),
+				);
+			setDeleteOpen(false);
+			onDelete(service._id);
+			toast.success("Service deleted.");
+			router.refresh();
+		} catch (error) {
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Could not delete the service.",
+			);
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	return (
+		<div className="flex flex-wrap items-center gap-2">
+			<Button
+				render={
+					<Link
+						href={`/dashboard/technician/my-services/${service._id}/edit`}
+					/>
+				}
+				nativeButton={false}
+				variant="outline"
+				size="sm"
+			>
+				Edit
+			</Button>
+			<button
+				type="button"
+				role="switch"
+				aria-checked={Boolean(service.isAvailable)}
+				aria-label={`Availability for ${service.title}`}
+				disabled={busy}
+				onClick={changeAvailability}
+				className="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+			>
+				<span
+					className={`relative h-5 w-9 rounded-full transition-colors ${service.isAvailable ? "bg-primary" : "bg-muted-foreground/40"}`}
+				>
+					<span
+						className={`absolute top-0.5 size-4 rounded-full bg-background shadow-sm transition-transform ${service.isAvailable ? "translate-x-[18px]" : "translate-x-0.5"}`}
+					/>
+				</span>
+				{service.isAvailable ? "Available" : "Unavailable"}
+			</button>
+			<AlertDialog.Root open={deleteOpen} onOpenChange={setDeleteOpen}>
+				<Button
+					type="button"
+					variant="destructive"
+					size="sm"
+					disabled={busy}
+					onClick={() => setDeleteOpen(true)}
+				>
+					Delete
+				</Button>
+				<AlertDialog.Portal>
+					<AlertDialog.Backdrop className="fixed inset-0 z-50 bg-black/50" />
+					<AlertDialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[min(400px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-xl">
+						<AlertDialog.Title className="font-heading text-xl font-semibold">
+							Delete this service?
+						</AlertDialog.Title>
+						<AlertDialog.Description className="mt-2 text-sm text-muted-foreground">
+							This will permanently delete {service.title}.
+						</AlertDialog.Description>
+						<div className="mt-6 flex justify-end gap-3">
+							<AlertDialog.Close
+								render={<Button variant="outline" disabled={busy} />}
+							>
+								Cancel
+							</AlertDialog.Close>
+							<Button
+								type="button"
+								variant="destructive"
+								disabled={busy}
+								onClick={deleteService}
+							>
+								{busy ? "Deleting..." : "Delete Service"}
+							</Button>
+						</div>
+					</AlertDialog.Popup>
+				</AlertDialog.Portal>
+			</AlertDialog.Root>
+		</div>
+	);
+}
+
 export function MyServicesList({
 	services,
 }: {
 	services: TechnicianService[] | null;
 }) {
+	const [rows, setRows] = useState(services);
+	useEffect(() => setRows(services), [services]);
+	function updateService(updated: TechnicianService) {
+		setRows(
+			(current) =>
+				current?.map((service) =>
+					service._id === updated._id ? updated : service,
+				) ?? null,
+		);
+	}
+	function deleteService(id: string) {
+		setRows(
+			(current) => current?.filter((service) => service._id !== id) ?? null,
+		);
+	}
 	return (
 		<main className="bg-background py-12 text-foreground sm:py-16 lg:py-20">
 			<div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
@@ -87,14 +275,14 @@ export function MyServicesList({
 					</p>
 				</div>
 
-				{services === null ? (
+				{rows === null ? (
 					<div
 						role="alert"
 						className="mt-9 rounded-xl border border-border bg-card p-6 text-sm text-destructive"
 					>
 						Could not load your services. Please try again.
 					</div>
-				) : services.length === 0 ? (
+				) : rows.length === 0 ? (
 					<div className="mt-9 rounded-xl border border-border bg-card p-6 sm:p-8">
 						<p className="font-heading text-lg font-semibold">
 							No services yet
@@ -113,7 +301,7 @@ export function MyServicesList({
 				) : (
 					<>
 						<div className="mt-9 space-y-4 lg:hidden">
-							{services.map((service) => (
+							{rows.map((service) => (
 								<article
 									key={service._id}
 									className="rounded-xl border border-border bg-card p-4 text-card-foreground sm:p-5"
@@ -149,6 +337,13 @@ export function MyServicesList({
 											</dd>
 										</div>
 									</dl>
+									<div className="mt-4 border-t border-border pt-4">
+										<ServiceActions
+											service={service}
+											onUpdate={updateService}
+											onDelete={deleteService}
+										/>
+									</div>
 								</article>
 							))}
 						</div>
@@ -172,10 +367,13 @@ export function MyServicesList({
 										<th scope="col" className="px-5 py-4">
 											Availability
 										</th>
+										<th scope="col" className="px-5 py-4">
+											Actions
+										</th>
 									</tr>
 								</thead>
 								<tbody className="divide-y divide-border">
-									{services.map((service) => (
+									{rows.map((service) => (
 										<tr key={service._id}>
 											<td className="px-5 py-4">
 												<div className="flex min-w-0 items-center gap-3">
@@ -196,6 +394,13 @@ export function MyServicesList({
 											</td>
 											<td className="px-5 py-4">
 												{availabilityBadge(service.isAvailable)}
+											</td>
+											<td className="px-5 py-4">
+												<ServiceActions
+													service={service}
+													onUpdate={updateService}
+													onDelete={deleteService}
+												/>
 											</td>
 										</tr>
 									))}

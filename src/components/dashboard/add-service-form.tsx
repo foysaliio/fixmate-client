@@ -1,7 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import type { TechnicianService } from "@/components/dashboard/my-services-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -33,7 +35,13 @@ async function apiError(response: Response, fallback: string) {
 		: fallback;
 }
 
-export function AddServiceForm() {
+export function AddServiceForm({
+	initialService,
+}: {
+	initialService?: TechnicianService;
+}) {
+	const router = useRouter();
+	const isEditing = Boolean(initialService);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [formError, setFormError] = useState("");
 
@@ -52,6 +60,7 @@ export function AddServiceForm() {
 		const serviceArea = String(data.get("serviceArea") || "").trim();
 		const basePrice = Number(data.get("basePrice"));
 		const image = data.get("image");
+		const hasNewImage = image instanceof File && image.name !== "";
 
 		if (
 			!title ||
@@ -62,19 +71,23 @@ export function AddServiceForm() {
 			!serviceArea
 		) {
 			setFormError("Complete all service details.");
+			toast.error("Complete all service details.");
 			return;
 		}
 		if (!Number.isFinite(basePrice) || basePrice <= 0) {
 			setFormError("Enter a base price greater than 0.");
+			toast.error("Enter a base price greater than 0.");
 			return;
 		}
 		if (
-			!(image instanceof File) ||
-			!image.size ||
-			!acceptedImageTypes.has(image.type) ||
-			image.size > maxImageBytes
+			(!isEditing && !hasNewImage) ||
+			(hasNewImage &&
+				(!image.size ||
+					!acceptedImageTypes.has(image.type) ||
+					image.size > maxImageBytes))
 		) {
 			setFormError("Choose a JPEG, PNG or WebP image up to 5 MB.");
+			toast.error("Choose a JPEG, PNG or WebP image up to 5 MB.");
 			return;
 		}
 
@@ -90,47 +103,65 @@ export function AddServiceForm() {
 				throw new Error("Could not verify your session.");
 			const authorization = `Bearer ${tokenData.accessToken}`;
 
-			const uploadForm = new FormData();
-			uploadForm.append("image", image);
-			const uploadResponse = await fetch("/api/uploads/image", {
-				method: "POST",
-				headers: { authorization },
-				body: uploadForm,
-			});
-			if (!uploadResponse.ok)
-				throw new Error(
-					await apiError(uploadResponse, "Could not upload the image."),
-				);
-			const uploaded: { url?: string } = await uploadResponse.json();
-			if (!uploaded.url) throw new Error("Could not upload the image.");
+			let imageUrl = initialService?.image;
+			if (hasNewImage) {
+				const uploadForm = new FormData();
+				uploadForm.append("image", image);
+				const uploadResponse = await fetch("/api/uploads/image", {
+					method: "POST",
+					headers: { authorization },
+					body: uploadForm,
+				});
+				if (!uploadResponse.ok)
+					throw new Error(
+						await apiError(uploadResponse, "Could not upload the image."),
+					);
+				const uploaded: { url?: string } = await uploadResponse.json();
+				if (!uploaded.url) throw new Error("Could not upload the image.");
+				imageUrl = uploaded.url;
+			}
+			if (!imageUrl) throw new Error("Choose a service image.");
 
-			const serviceResponse = await fetch("/api/services", {
-				method: "POST",
-				headers: { authorization, "content-type": "application/json" },
-				body: JSON.stringify({
-					title,
-					description,
-					category,
-					basePrice,
-					estimatedDuration,
-					serviceMode,
-					serviceArea,
-					image: uploaded.url,
-				}),
-			});
+			const serviceResponse = await fetch(
+				isEditing ? `/api/services/${initialService?._id}` : "/api/services",
+				{
+					method: isEditing ? "PATCH" : "POST",
+					headers: { authorization, "content-type": "application/json" },
+					body: JSON.stringify({
+						title,
+						description,
+						category,
+						basePrice,
+						estimatedDuration,
+						serviceMode,
+						serviceArea,
+						image: imageUrl,
+					}),
+				},
+			);
 			if (!serviceResponse.ok)
 				throw new Error(
-					await apiError(serviceResponse, "Could not submit the service."),
+					await apiError(
+						serviceResponse,
+						isEditing
+							? "Could not save the service."
+							: "Could not submit the service.",
+					),
 				);
 
-			form.reset();
-			toast.success("Service submitted for review");
+			if (isEditing) {
+				toast.success("Service updated and submitted for review.");
+				router.push("/dashboard/technician/my-services");
+				router.refresh();
+			} else {
+				form.reset();
+				toast.success("Service submitted for review");
+			}
 		} catch (error) {
-			setFormError(
-				error instanceof Error
-					? error.message
-					: "Could not submit the service.",
-			);
+			const message =
+				error instanceof Error ? error.message : "Could not save the service.";
+			setFormError(message);
+			toast.error(message);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -141,10 +172,12 @@ export function AddServiceForm() {
 			<div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
 				<div className="max-w-3xl [&_h1]:text-[30px] [&_h1]:leading-tight lg:[&_h1]:text-[36px]">
 					<SectionHeading label="TECHNICIAN SERVICES" level="h1">
-						Add a Service
+						{isEditing ? "Edit Service" : "Add a Service"}
 					</SectionHeading>
 					<p className="mt-5 text-base text-muted-foreground">
-						Share your repair service for review before it appears publicly.
+						{isEditing
+							? "Update your service details. Changes return it to pending review."
+							: "Share your repair service for review before it appears publicly."}
 					</p>
 
 					<form
@@ -165,6 +198,7 @@ export function AddServiceForm() {
 									required
 									maxLength={160}
 									placeholder="e.g. AC cooling repair"
+									defaultValue={initialService?.title}
 								/>
 							</div>
 							<div>
@@ -181,6 +215,7 @@ export function AddServiceForm() {
 									rows={5}
 									className={textareaClassName}
 									placeholder="Describe what your service covers"
+									defaultValue={initialService?.description}
 								/>
 							</div>
 							<div className="grid gap-5 sm:grid-cols-2">
@@ -195,7 +230,7 @@ export function AddServiceForm() {
 										id="service-category"
 										name="category"
 										required
-										defaultValue=""
+										defaultValue={initialService?.category ?? ""}
 										className={selectClassName}
 									>
 										<option value="" disabled>
@@ -224,6 +259,7 @@ export function AddServiceForm() {
 										inputMode="decimal"
 										required
 										placeholder="0.00"
+										defaultValue={initialService?.basePrice}
 									/>
 								</div>
 								<div>
@@ -238,6 +274,7 @@ export function AddServiceForm() {
 										name="estimatedDuration"
 										required
 										placeholder="e.g. 2 hours"
+										defaultValue={initialService?.estimatedDuration}
 									/>
 								</div>
 								<div>
@@ -251,7 +288,7 @@ export function AddServiceForm() {
 										id="service-mode"
 										name="serviceMode"
 										required
-										defaultValue=""
+										defaultValue={initialService?.serviceMode ?? ""}
 										className={selectClassName}
 									>
 										<option value="" disabled>
@@ -276,6 +313,7 @@ export function AddServiceForm() {
 										name="serviceArea"
 										required
 										placeholder="e.g. Dhaka"
+										defaultValue={initialService?.serviceArea}
 									/>
 								</div>
 							</div>
@@ -291,10 +329,11 @@ export function AddServiceForm() {
 									name="image"
 									type="file"
 									accept="image/jpeg,image/png,image/webp"
-									required
+									required={!isEditing}
 									className="h-auto min-h-11 py-2 text-sm"
 								/>
 								<p className="mt-1.5 text-xs text-muted-foreground">
+									{isEditing ? "Leave blank to keep the current image. " : ""}
 									JPEG, PNG or WebP, up to 5 MB.
 								</p>
 							</div>
@@ -304,7 +343,11 @@ export function AddServiceForm() {
 								</p>
 							)}
 							<Button type="submit" disabled={isSubmitting}>
-								{isSubmitting ? "Submitting service..." : "Submit Service"}
+								{isSubmitting
+									? "Saving service..."
+									: isEditing
+										? "Save Changes"
+										: "Submit Service"}
 							</Button>
 						</fieldset>
 					</form>
