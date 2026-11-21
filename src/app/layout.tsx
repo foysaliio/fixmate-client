@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppToaster } from "@/components/ui/app-toaster";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
+          <AppToaster />
         </ThemeProvider>
       </body>
     </html>
