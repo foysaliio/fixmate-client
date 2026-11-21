@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { type DashboardRole, dashboardPathForRole } from "@/lib/auth-roles";
 import { getAuthSession } from "@/lib/server-auth";
@@ -47,6 +49,13 @@ export async function DashboardLanding({
 					<p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
 						{content.description}
 					</p>
+					<Button
+						render={<Link href="/dashboard/profile" />}
+						nativeButton={false}
+						className="mt-8"
+					>
+						Update Profile
+					</Button>
 				</div>
 			</div>
 		</main>

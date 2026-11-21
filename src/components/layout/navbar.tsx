@@ -1,6 +1,13 @@
 "use client";
 
-import { LayoutDashboard, LogOut, Menu, Wrench, X } from "lucide-react";
+import {
+	LayoutDashboard,
+	LogOut,
+	Menu,
+	UserRound,
+	Wrench,
+	X,
+} from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -202,6 +209,14 @@ export function Navbar() {
 						>
 							<LayoutDashboard aria-hidden="true" className="size-4" />
 							Dashboard
+						</Link>
+						<Link
+							href="/dashboard/profile"
+							onClick={closeMenu}
+							className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+						>
+							<UserRound aria-hidden="true" className="size-4" />
+							Update Profile
 						</Link>
 						<button
 							type="button"

@@ -6,6 +6,7 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Menu,
+	UserRound,
 	Wrench,
 	X,
 } from "lucide-react";
@@ -139,6 +140,15 @@ export function DashboardLayout({
 					Overview
 				</Link>
 				<Link
+					href="/dashboard/profile"
+					onClick={() => setMenuOpen(false)}
+					aria-current={pathname === "/dashboard/profile" ? "page" : undefined}
+					className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/profile" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+				>
+					<UserRound aria-hidden="true" className="size-5" />
+					Update Profile
+				</Link>
+				<Link
 					href="/"
 					onClick={() => setMenuOpen(false)}
 					className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -223,6 +233,14 @@ export function DashboardLayout({
 												{roleLabel(user.role)}
 											</p>
 										</div>
+										<Link
+											href="/dashboard/profile"
+											onClick={() => setProfileOpen(false)}
+											className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+										>
+											<UserRound aria-hidden="true" className="size-4" />
+											Update Profile
+										</Link>
 										<button
 											type="button"
 											disabled={signingOut}

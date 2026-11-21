@@ -10,6 +10,18 @@ const nextConfig: NextConfig = {
         source: "/api/auth/:path*",
         destination: `${apiBaseUrl.replace(/\/$/, "")}/api/auth/:path*`,
       },
+      {
+        source: "/api/access-token",
+        destination: `${apiBaseUrl.replace(/\/$/, "")}/api/access-token`,
+      },
+      {
+        source: "/api/uploads/image",
+        destination: `${apiBaseUrl.replace(/\/$/, "")}/api/uploads/image`,
+      },
+      {
+        source: "/api/users/profile",
+        destination: `${apiBaseUrl.replace(/\/$/, "")}/api/users/profile`,
+      },
     ];
   },
   turbopack: {

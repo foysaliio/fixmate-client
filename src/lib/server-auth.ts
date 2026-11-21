@@ -8,6 +8,9 @@ type AuthSession = {
     email: string;
     role?: string;
     image?: string | null;
+    phone?: string | null;
+    area?: string | null;
+    bio?: string | null;
   };
   session: { id: string };
 };
