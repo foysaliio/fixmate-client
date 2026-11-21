@@ -4,6 +4,8 @@
 @source "./(public)/sign-up";
 @source "./(public)/sign-in";
 @source "../components/auth";
+@source "../components/dashboard";
+@source "./(public)/dashboard";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
