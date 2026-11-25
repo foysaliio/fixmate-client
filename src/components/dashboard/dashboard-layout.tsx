@@ -308,6 +308,19 @@ export function DashboardLayout({
 					</aside>
 				</div>
 			)}
+			{user.role === "admin" && (
+				<Link
+					href="/dashboard/admin/services"
+					onClick={() => setMenuOpen(false)}
+					aria-current={
+						pathname === "/dashboard/admin/services" ? "page" : undefined
+					}
+					className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/admin/services" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+				>
+					<ListChecks aria-hidden="true" className="size-5" />
+					Service Approval
+				</Link>
+			)}
 		</div>
 	);
 }

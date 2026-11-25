@@ -3,7 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Service } from "@/components/services/service-card";
+import { RequestRepair } from "@/components/services/request-repair";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { getAuthSession } from "@/lib/server-auth";
 
 type ServiceImage = string | { url?: string };
 
@@ -31,7 +33,7 @@ export default async function ServiceDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const service = await getService(id);
+  const [service, session] = await Promise.all([getService(id), getAuthSession()]);
   const title = service.title || "Untitled service";
   const photo =
     service.imageUrl ||
@@ -131,6 +133,8 @@ export default async function ServiceDetailsPage({
                 </div>
               </div>
             </dl>
+
+            <RequestRepair serviceId={id} user={session?.user ?? null} />
           </aside>
         </div>
       </div>

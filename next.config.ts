@@ -15,12 +15,20 @@ const nextConfig: NextConfig = {
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/access-token`,
 			},
 			{
+				source: "/api/bookings",
+				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/bookings`,
+			},
+			{
 				source: "/api/services",
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/services`,
 			},
 			{
 				source: "/api/services/:path*",
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/services/:path*`,
+			},
+			{
+				source: "/api/admin/services/:path*",
+				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/admin/services/:path*`,
 			},
 			{
 				source: "/api/uploads/image",

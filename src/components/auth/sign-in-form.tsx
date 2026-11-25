@@ -19,7 +19,7 @@ function emailError(email: string) {
   return "";
 }
 
-export function SignInForm() {
+export function SignInForm({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +47,7 @@ export function SignInForm() {
       }
 
       toast.success("Welcome back to FixMate.");
-      router.replace(dashboardPathForRole((data?.user as { role?: unknown } | undefined)?.role));
+      router.replace(returnTo ?? dashboardPathForRole((data?.user as { role?: unknown } | undefined)?.role));
     } catch {
       setFormError("Unable to sign in right now. Please try again.");
     } finally {
