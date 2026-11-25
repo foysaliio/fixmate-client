@@ -181,6 +181,15 @@ export function DashboardLayout({
 							<ListChecks aria-hidden="true" className="size-5" />
 							My Services
 						</Link>
+						<Link
+							href="/dashboard/technician/requests"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/technician/requests" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/technician/requests" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ClipboardList aria-hidden="true" className="size-5" />
+							Manage Requests
+						</Link>
 					</>
 				)}
 				<Link
