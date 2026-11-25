@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { RequestActions } from "@/components/dashboard/request-actions";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { dashboardPathForRole } from "@/lib/auth-roles";
 import { getAuthSession } from "@/lib/server-auth";
@@ -18,6 +19,8 @@ type Booking = {
   serviceTitle?: string;
   serviceImage?: string | { url?: string };
   status?: string;
+  paymentStatus?: string;
+  basePrice?: number;
 };
 
 const filters: { value: RequestStatus; label: string }[] = [
@@ -61,19 +64,6 @@ function dateLabel(value: string | undefined) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "—";
   return new Intl.DateTimeFormat("en-BD", { dateStyle: "medium", timeZone: "UTC" })
     .format(new Date(`${value}T00:00:00Z`));
-}
-
-function statusLabel(value: string | undefined) {
-  if (!value) return "Unknown";
-  return value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function StatusBadge({ status }: { status?: string }) {
-  return (
-    <span className="inline-flex rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-      {statusLabel(status)}
-    </span>
-  );
 }
 
 function ServiceIdentity({ booking }: { booking: Booking }) {
@@ -148,7 +138,7 @@ export default async function TechnicianRequestsPage({
                     <div><dt className="text-muted-foreground">Phone</dt><dd className="mt-1 font-medium">{booking.phone || "—"}</dd></div>
                     <div className="col-span-2"><dt className="text-muted-foreground">Address</dt><dd className="mt-1 break-words">{booking.address || "—"}</dd></div>
                     <div><dt className="text-muted-foreground">Preferred date</dt><dd className="mt-1 font-medium">{dateLabel(booking.preferredDate)}</dd></div>
-                    <div><dt className="text-muted-foreground">Status</dt><dd className="mt-1"><StatusBadge status={booking.status} /></dd></div>
+                    <div><dt className="text-muted-foreground">Status</dt><dd className="mt-1"><RequestActions booking={booking} /></dd></div>
                     <div className="col-span-2"><dt className="text-muted-foreground">Problem description</dt><dd className="mt-1 whitespace-pre-wrap break-words">{booking.problemDescription || "—"}</dd></div>
                   </dl>
                 </li>
@@ -177,7 +167,7 @@ export default async function TechnicianRequestsPage({
                       <td className="max-w-48 break-words px-4 py-4">{booking.address || "—"}</td>
                       <td className="whitespace-nowrap px-4 py-4">{dateLabel(booking.preferredDate)}</td>
                       <td className="max-w-64 whitespace-pre-wrap break-words px-4 py-4">{booking.problemDescription || "—"}</td>
-                      <td className="px-5 py-4"><StatusBadge status={booking.status} /></td>
+                      <td className="px-5 py-4"><RequestActions booking={booking} /></td>
                     </tr>
                   ))}
                 </tbody>

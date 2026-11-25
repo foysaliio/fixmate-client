@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/bookings/:id/cancel`,
 			},
 			{
+				source: "/api/bookings/:id/status",
+				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/bookings/:id/status`,
+			},
+			{
 				source: "/api/services",
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/services`,
 			},
