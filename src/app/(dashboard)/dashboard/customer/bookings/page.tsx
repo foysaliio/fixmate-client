@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { BookingStatus } from "@/components/dashboard/booking-status";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { dashboardPathForRole } from "@/lib/auth-roles";
@@ -125,7 +126,7 @@ export default async function MyBookingsPage() {
                     <div><dt className="text-muted-foreground">Preferred date</dt><dd className="mt-1 font-medium">{dateLabel(booking.preferredDate)}</dd></div>
                     <div><dt className="text-muted-foreground">Starting price</dt><dd className="mt-1 font-medium">{money(booking.basePrice)}</dd></div>
                     <div><dt className="text-muted-foreground">Final amount</dt><dd className="mt-1 font-medium">{money(booking.finalAmount)}</dd></div>
-                    <div><dt className="text-muted-foreground">Booking status</dt><dd className="mt-1"><StatusBadge value={booking.status} /></dd></div>
+                    <div><dt className="text-muted-foreground">Booking status</dt><dd className="mt-1"><BookingStatus id={booking._id} status={booking.status} serviceTitle={booking.serviceTitle} /></dd></div>
                     <div><dt className="text-muted-foreground">Payment status</dt><dd className="mt-1"><StatusBadge value={booking.paymentStatus} /></dd></div>
                   </dl>
                 </li>
@@ -153,7 +154,7 @@ export default async function MyBookingsPage() {
                       <td className="whitespace-nowrap px-4 py-4">{dateLabel(booking.preferredDate)}</td>
                       <td className="whitespace-nowrap px-4 py-4">{money(booking.basePrice)}</td>
                       <td className="whitespace-nowrap px-4 py-4">{money(booking.finalAmount)}</td>
-                      <td className="px-4 py-4"><StatusBadge value={booking.status} /></td>
+                      <td className="px-4 py-4"><BookingStatus id={booking._id} status={booking.status} serviceTitle={booking.serviceTitle} /></td>
                       <td className="px-5 py-4"><StatusBadge value={booking.paymentStatus} /></td>
                     </tr>
                   ))}
