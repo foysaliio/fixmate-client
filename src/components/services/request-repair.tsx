@@ -104,7 +104,12 @@ export function RequestRepair({ serviceId, user }: { serviceId: string; user: Us
       ) : user.role !== "customer" ? (
         <p role="status" className="mt-4 text-sm text-muted-foreground">Only customers can request a repair</p>
       ) : isRequested ? (
-        <p role="status" className="mt-4 text-sm text-primary">Your repair request has been submitted.</p>
+        <div role="status" className="mt-4 space-y-3 text-sm">
+          <p className="text-primary">Your repair request has been submitted.</p>
+          <Link href="/dashboard/customer/bookings" className="inline-block font-medium text-primary underline-offset-4 hover:underline">
+            My Bookings
+          </Link>
+        </div>
       ) : (
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <fieldset disabled={isSubmitting} className="space-y-4">

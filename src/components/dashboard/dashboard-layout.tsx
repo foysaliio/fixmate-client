@@ -4,6 +4,7 @@ import {
 	ChevronDown,
 	House,
 	LayoutDashboard,
+	ClipboardList,
 	ListChecks,
 	LogOut,
 	Menu,
@@ -141,6 +142,17 @@ export function DashboardLayout({
 					<LayoutDashboard aria-hidden="true" className="size-5" />
 					Overview
 				</Link>
+				{user.role === "customer" && (
+					<Link
+						href="/dashboard/customer/bookings"
+						onClick={() => setMenuOpen(false)}
+						aria-current={pathname === "/dashboard/customer/bookings" ? "page" : undefined}
+						className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/customer/bookings" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+					>
+						<ClipboardList aria-hidden="true" className="size-5" />
+						My Bookings
+					</Link>
+				)}
 				{user.role === "technician" && (
 					<>
 						<Link
