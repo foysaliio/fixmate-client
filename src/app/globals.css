@@ -1,13 +1,14 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 @source "../components/services";
 @source "./(public)/services";
 @source "./(public)/sign-up";
 @source "./(public)/sign-in";
+@source "./(public)/payment";
 @source "../components/auth";
 @source "../components/dashboard";
 @source "./(dashboard)";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
