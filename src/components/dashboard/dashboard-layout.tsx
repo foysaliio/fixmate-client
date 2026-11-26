@@ -225,6 +225,15 @@ export function DashboardLayout({
 							<ListChecks aria-hidden="true" className="size-5" />
 							Service Approval
 						</Link>
+						<Link
+							href="/dashboard/admin/bookings"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/admin/bookings" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/admin/bookings" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ClipboardList aria-hidden="true" className="size-5" />
+							All Bookings
+						</Link>
 					</>
 				)}
 				<Link
