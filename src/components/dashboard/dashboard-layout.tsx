@@ -234,6 +234,15 @@ export function DashboardLayout({
 							<ClipboardList aria-hidden="true" className="size-5" />
 							All Bookings
 						</Link>
+						<Link
+							href="/dashboard/admin/transactions"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/admin/transactions" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/admin/transactions" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ReceiptText aria-hidden="true" className="size-5" />
+							Transactions
+						</Link>
 					</>
 				)}
 				<Link
