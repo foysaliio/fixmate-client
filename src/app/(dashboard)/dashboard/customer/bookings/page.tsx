@@ -1,53 +1,14 @@
 import { Wrench } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { BookingStatus } from "@/components/dashboard/booking-status";
 import { PayNowButton } from "@/components/dashboard/pay-now-button";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { dashboardPathForRole } from "@/lib/auth-roles";
+import { type CustomerBooking as Booking, getMyBookings } from "@/lib/customer-bookings";
 import { getAuthSession } from "@/lib/server-auth";
-
-type Booking = {
-  _id: string;
-  serviceTitle?: string;
-  serviceImage?: string | { url?: string };
-  technicianName?: string;
-  preferredDate?: string;
-  basePrice?: number;
-  finalAmount?: number;
-  status?: string;
-  paymentStatus?: string;
-};
-
-async function getMyBookings(): Promise<Booking[] | null> {
-  const apiBaseUrl = process.env.API_BASE_URL;
-  const cookie = (await headers()).get("cookie");
-  if (!apiBaseUrl || !cookie) return null;
-
-  try {
-    const tokenResponse = await fetch(new URL("/api/access-token", apiBaseUrl), {
-      method: "POST",
-      headers: { cookie },
-      cache: "no-store",
-    });
-    if (!tokenResponse.ok) return null;
-    const tokenData: { accessToken?: string } = await tokenResponse.json();
-    if (!tokenData.accessToken) return null;
-
-    const response = await fetch(new URL("/api/bookings/my", apiBaseUrl), {
-      headers: { authorization: `Bearer ${tokenData.accessToken}` },
-      cache: "no-store",
-    });
-    if (!response.ok) return null;
-    const data: unknown = await response.json();
-    return Array.isArray(data) ? (data as Booking[]) : null;
-  } catch {
-    return null;
-  }
-}
 
 function money(amount: number | undefined) {
   return typeof amount === "number" && Number.isFinite(amount)
