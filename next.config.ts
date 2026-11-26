@@ -51,6 +51,10 @@ const nextConfig: NextConfig = {
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/admin/services/:path*`,
 			},
 			{
+				source: "/api/admin/users/:path*",
+				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/admin/users/:path*`,
+			},
+			{
 				source: "/api/uploads/image",
 				destination: `${apiBaseUrl.replace(/\/$/, "")}/api/uploads/image`,
 			},

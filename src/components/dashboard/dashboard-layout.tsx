@@ -8,8 +8,10 @@ import {
 	ListChecks,
 	LogOut,
 	Menu,
+	ReceiptText,
 	SquarePlus,
 	UserRound,
+	UsersRound,
 	Wrench,
 	X,
 } from "lucide-react";
@@ -143,15 +145,26 @@ export function DashboardLayout({
 					Overview
 				</Link>
 				{user.role === "customer" && (
-					<Link
-						href="/dashboard/customer/bookings"
-						onClick={() => setMenuOpen(false)}
-						aria-current={pathname === "/dashboard/customer/bookings" ? "page" : undefined}
-						className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/customer/bookings" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-					>
-						<ClipboardList aria-hidden="true" className="size-5" />
-						My Bookings
-					</Link>
+					<>
+						<Link
+							href="/dashboard/customer/bookings"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/customer/bookings" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/customer/bookings" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ClipboardList aria-hidden="true" className="size-5" />
+							My Bookings
+						</Link>
+						<Link
+							href="/dashboard/customer/payments"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/customer/payments" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/customer/payments" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ReceiptText aria-hidden="true" className="size-5" />
+							Payment History
+						</Link>
+					</>
 				)}
 				{user.role === "technician" && (
 					<>
@@ -189,6 +202,28 @@ export function DashboardLayout({
 						>
 							<ClipboardList aria-hidden="true" className="size-5" />
 							Manage Requests
+						</Link>
+					</>
+				)}
+				{user.role === "admin" && (
+					<>
+						<Link
+							href="/dashboard/admin/users"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/admin/users" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/admin/users" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<UsersRound aria-hidden="true" className="size-5" />
+							Users
+						</Link>
+						<Link
+							href="/dashboard/admin/services"
+							onClick={() => setMenuOpen(false)}
+							aria-current={pathname === "/dashboard/admin/services" ? "page" : undefined}
+							className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/admin/services" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+						>
+							<ListChecks aria-hidden="true" className="size-5" />
+							Service Approval
 						</Link>
 					</>
 				)}
@@ -328,19 +363,6 @@ export function DashboardLayout({
 						{sidebarContent(true)}
 					</aside>
 				</div>
-			)}
-			{user.role === "admin" && (
-				<Link
-					href="/dashboard/admin/services"
-					onClick={() => setMenuOpen(false)}
-					aria-current={
-						pathname === "/dashboard/admin/services" ? "page" : undefined
-					}
-					className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${pathname === "/dashboard/admin/services" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-				>
-					<ListChecks aria-hidden="true" className="size-5" />
-					Service Approval
-				</Link>
 			)}
 		</div>
 	);

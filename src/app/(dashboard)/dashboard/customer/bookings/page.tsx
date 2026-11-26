@@ -51,7 +51,7 @@ async function getMyBookings(): Promise<Booking[] | null> {
 
 function money(amount: number | undefined) {
   return typeof amount === "number" && Number.isFinite(amount)
-    ? `৳${new Intl.NumberFormat("en-BD").format(amount)}`
+    ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount)
     : "—";
 }
 

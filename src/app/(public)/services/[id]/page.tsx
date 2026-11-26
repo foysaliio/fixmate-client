@@ -48,7 +48,7 @@ export default async function ServiceDetailsPage({
     "To be assigned";
   const price =
     typeof service.basePrice === "number" && Number.isFinite(service.basePrice)
-      ? `৳${new Intl.NumberFormat("en-BD").format(service.basePrice)}`
+      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(service.basePrice)
       : "On request";
 
   return (
