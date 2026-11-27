@@ -103,18 +103,15 @@ test("desktop table and mobile cards both include request actions", async () => 
     "lucide-react": { Wrench },
     "next/image": { __esModule: true, default: Image },
     "next/link": { __esModule: true, default: Link },
-    "next/headers": { headers: async () => ({ get: () => "session=test" }) },
     "next/navigation": { redirect: () => { throw new Error("Unexpected redirect"); } },
     "@/components/dashboard/request-actions": { RequestActions: RequestActionsStub },
     "@/components/ui/section-heading": { SectionHeading },
     "@/lib/auth-roles": { dashboardPathForRole: () => "/dashboard/technician" },
     "@/lib/server-auth": { getAuthSession: async () => ({ user: { role: "technician" } }) },
-  }, {
-    URL,
-    process: { env: { API_BASE_URL: "http://localhost:3001" } },
-    fetch: async (url) => url.pathname === "/api/access-token"
-      ? { ok: true, json: async () => ({ accessToken: "test-jwt" }) }
-      : { ok: true, json: async () => bookings },
+    "@/lib/technician-requests": { getTechnicianRequests: async (status) => {
+      assert.equal(status, "all");
+      return bookings;
+    } },
   });
   const tree = await Page({ searchParams: Promise.resolve({ status: "all" }) });
   const mobile = collect(tree, (node) => node.type === "ul" && node.props?.className?.includes("lg:hidden"))[0];
